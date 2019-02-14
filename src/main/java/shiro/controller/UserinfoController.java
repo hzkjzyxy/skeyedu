@@ -16,4 +16,7 @@ public class UserinfoController {
 		
 		return "UserList";
 	}
+	public void test() {
+		System.out.println("hello world");
+	}
 }
