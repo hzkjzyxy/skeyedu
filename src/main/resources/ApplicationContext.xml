@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+   	<!--dataSource  -->
+   
+
+ 
+    <!-- =========================================================
+         Shiro Core Components - Not Spring Specific
+         ========================================================= -->
+    <!-- 1.初始化SecurityManager -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+       
+        <property name="sessionMode" value="native"/>
+        <property name="realm" ref="jdbcRealm"/>
+    </bean>
+
+    <!-- 2.缓存管理器 -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+
+        <property name="cacheManagerConfigFile" value="classpath:ehcache.xml"/> 
+    </bean>
+
+    <!-- 3.数据访问  dao -->
+    <bean id="jdbcRealm" class="shiro.shiroRealm.JDBCRealm">
+    
+    </bean>
+
+    <!-- =========================================================
+         Shiro Spring-specific integration
+         ========================================================= -->
+    <!-- 4.shiro生命周期 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- 5.shiro注解  前提4 --> 
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+ 
+
+    <!-- 6.shirofilter id要和web.xml下面一致-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/"/>
+        <property name="successUrl" value="/UserList.jsp"/>
+       
+        <!-- 定义需要shiro保护的资源和所需要的权限 -->
+        <property name="filterChainDefinitions">
+            <value>
+                /login = anon
+               	/bootstrap/** = anon
+               	/ = anon
+                # everything else requires authentication:
+                /** = authc
+            </value>
+        </property>
+    </bean>
+</beans>
