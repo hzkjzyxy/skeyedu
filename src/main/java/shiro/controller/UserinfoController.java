@@ -19,4 +19,7 @@ public class UserinfoController {
 	public void test() {
 		System.out.println("hello world");
 	}
+	public void test1() {
+		System.out.println("hello world1");
+	}
 }
